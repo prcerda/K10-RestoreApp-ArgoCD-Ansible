@@ -1,0 +1,42 @@
+- name: Get Last Restore Point for Namespace {{ nspace }}
+  shell:
+     "kubectl get restorepoints.apps.kio.kasten.io --selector=k10.kasten.io/exportType=portableAppData --field-selector=metadata.namespace='{{ nspace }}' --sort-by=.status.actionTime | awk '{print $1}'  | cut -d/ -f2 | tail -n 1"
+  register: apprespoint
+  when: (nspace != "NAMESPACE" and nspace != "default" and nspace != "kasten-io")
+
+- name: "create {{ nspace }} namespace for restored app"
+  kubernetes.core.k8s:
+    state: present
+    definition: 
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ nspace }}"
+  when: (nspace != "NAMESPACE" and nspace != "default" and nspace != "kasten-io")
+
+- name: "restore app {{ nspace }}"
+  kubernetes.core.k8s:
+    state: present
+    definition: 
+        apiVersion: actions.kio.kasten.io/v1alpha1
+        kind: RestoreAction
+        metadata:
+          generateName: restore-"{{ nspace }}"-
+          namespace: "{{ nspace }}"
+        spec:
+          subject:
+            kind: RestorePoint
+            name: "{{ apprespoint.stdout }}"
+            namespace: "{{ nspace }}"
+          targetNamespace: "{{ nspace }}"
+          dataOnly: true
+          transforms:
+          - json:
+            - op: replace
+              path: /spec/storageClassName
+              value: "{{ storageclass }}"
+            name: changeStorageClass
+            subject:
+              resource: persistentvolumeclaims          
+  when: (nspace != "NAMESPACE" and nspace != "default" and nspace != "kasten-io" and apprespoint.stdout)
+  

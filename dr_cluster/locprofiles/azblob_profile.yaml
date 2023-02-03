@@ -1,0 +1,42 @@
+- name: CREATE AZURE STORAGE ACCOUNT SECRET
+  kubernetes.core.k8s:
+    state: present
+    definition: 
+      apiVersion: v1
+      kind: Secret
+      type: secrets.kanister.io/azure             
+      metadata:
+        name: "k10-{{ drloc_prof }}-secret"
+        namespace: kasten-io     
+      data:
+        azure_storage_account_id: "{{ dr_bucket|b64encode }}"
+        azure_storage_environment: "{{ azure_storage_env|b64encode }}"
+        azure_storage_key: "{{ azure_storage_key|b64encode }}"
+
+
+# Creating an Location Profile with DR Data 
+- name: Creating an Location Profile with DR Data
+  kubernetes.core.k8s:
+    state: present
+    definition: 
+        apiVersion: config.kio.kasten.io/v1alpha1
+        kind: Profile
+        metadata:
+          name: "{{ drloc_prof }}"
+          namespace: kasten-io
+        spec:
+          type: Location
+          locationSpec:
+            credential:
+              secretType: AzStorageAccount
+              secret:
+                apiVersion: v1
+                kind: Secret
+                name: "k10-{{ drloc_prof }}-secret"
+                namespace: kasten-io
+            type: ObjectStore
+            objectStore:
+              name: "{{ dr_bucket }}"
+              objectStoreType: AZ
+
+ 

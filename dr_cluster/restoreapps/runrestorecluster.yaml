@@ -1,0 +1,21 @@
+- name: Get Last Restore Point for Cluster backup
+  shell:
+     "kubectl get clusterrestorepoints.apps.kio.kasten.io --selector=k10.kasten.io/exportType=appConfigOnly --sort-by=.status.actionTime | awk '{print $1}'  | cut -d/ -f2 | tail -n 1"
+  register: clusterrespoint
+  
+- name: "restore cluster resources"
+  kubernetes.core.k8s:
+    state: present
+    definition: 
+        apiVersion: actions.kio.kasten.io/v1alpha1
+        kind: RestoreClusterAction
+        metadata:
+          generateName: restore-cluster-
+        spec:
+          subject:
+            kind: ClusterRestorePoint
+            name: "{{ clusterrespoint.stdout }}"
+  when: (clusterrespoint.stdout)
+   
+- name: debug
+  debug: var=clusterrespoint.stdout

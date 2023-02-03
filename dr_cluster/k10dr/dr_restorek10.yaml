@@ -1,0 +1,24 @@
+- name: CREATE DR SECRET
+  kubernetes.core.k8s:
+    state: present
+    definition: 
+      apiVersion: v1
+      kind: Secret
+      type: Opaque             
+      metadata:
+        name: "k10-dr-secret"
+        namespace: "kasten-io"     
+      data:
+        key: "{{ passphrase|b64encode }}"
+
+- name: Restore K10 Backup
+  kubernetes.core.helm:
+    name: k10-restore
+    namespace: kasten-io
+    chart_ref: kasten/k10restore
+    wait: True
+    state: present
+    values:
+        sourceClusterID: "{{ clusterid }}"
+        profile:
+            name: "{{ drloc_prof }}"

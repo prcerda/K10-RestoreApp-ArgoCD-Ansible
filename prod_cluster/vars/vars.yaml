@@ -1,0 +1,9 @@
+k10_infra: "AWSEKS"  # Choose between AWSEKS, AZAKS and GCGKE
+storageclass: "standard-rwo"  #Name of the Storage Class in the target Kubernetes cluster for importing applications-
+dr_bucket: "k10immutable"   #Bucket to be used as Location Profile for K10 Disaster Recovery
+drloc_prof: "k10immutable"  #Location Profile name for K10 Disaster Recovery
+drloc_prof_type: "awss3"    #Bucket type for K10 Disaster Recovery Location Profile  Options: awss3/azblob/gcsa
+loc_prof: "s3-k10"      #Location Profile name to be used to backup all applications.  Used when Policies are created.
+region: "eu-west-3"   #Bucket region
+company: "Demolab" #Company name for EULA
+email: "pcerda@demolab.com"   #E-Mail address for EULA

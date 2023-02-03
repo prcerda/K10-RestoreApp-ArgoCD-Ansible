@@ -1,0 +1,30 @@
+---
+- name: Kasten K10 Restore configuration from Disaster Recovery backup
+  hosts: localhost
+  vars:
+    k10_ns: "kasten-io"  
+  vars_files:
+    - vault_vars.yaml
+    - vars.yaml
+  collections:
+    - kubernetes.core
+    
+  tasks:
+# Location Profile from Azure Blob
+    - name: Location Profile from Azure Blob
+      include_tasks: locprofiles/azblob_profile.yaml 
+      when: (drloc_prof_type == "azblob" )
+      
+# Location Profile from AWS S3
+    - name: Location Profile from AWS S3
+      include_tasks: locprofiles/awss3_profile.yaml 
+      when: (drloc_prof_type == "awss3" )
+
+# Location Profile from GCS 
+    - name: Location Profile from GCS
+      include_tasks: locprofiles/gcsa_profile.yaml 
+      when: (drloc_prof_type == "gcsa" )      
+
+      
+    - name: restore Kasten DR Backup
+      include_tasks: k10dr/dr_restorek10.yaml

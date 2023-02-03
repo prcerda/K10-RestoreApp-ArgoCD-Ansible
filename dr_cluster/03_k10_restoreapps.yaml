@@ -1,0 +1,40 @@
+---
+- name: K10 Location Profile Creation
+  hosts: localhost
+  vars_files:
+    - vars.yaml
+  collections:
+    - kubernetes.core
+  tasks:
+    - name: "Get a list of all pods from any namespace"
+      k8s_info:
+        api_version: apps.kio.kasten.io/v1alpha1
+        kind: RestorePointContent
+        label_selectors:
+          - "k10.kasten.io/exportType=portableAppData"
+      register: rpcontent_list
+
+    - name: Create restore points FROM restore point content
+      include_tasks: restoreapps/runcreaterp.yaml
+      loop: "{{ rpcontent_list.resources }}"
+      loop_control:
+        loop_var: rpcontent
+
+    - name: Get all namespaces with restorepoints
+      shell:
+         "kubectl get restorepoints.apps.kio.kasten.io -A | awk '{print $1}' | sort | uniq"
+      register: appnspaces
+
+    - name: restore cluster resources
+      include_tasks: restoreapps/runrestorecluster.yaml      
+      
+    - name: Creating list of namespaces
+      set_fact:
+        one_list: appnspaces.stdout_lines | list
+    
+    - name: Restore all apps
+      include_tasks: restoreapps/runrestoreapp.yaml
+      loop: "{{ appnspaces.stdout_lines | list }}"
+      loop_control:
+        loop_var: nspace
+
