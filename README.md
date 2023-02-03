@@ -1,1 +1,0 @@
-# K10-RestoreApp-ArgoCD-Ansible
