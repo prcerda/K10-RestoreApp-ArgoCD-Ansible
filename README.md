@@ -112,6 +112,7 @@ Some deployment variables must be set into the vars files.  Alter the parameters
 
 ## Ansible Vault
 Some additional variables must be set in an Ansible Vault to keep the sensitive data required for authentication.
+
 [For Production Cluster](prod_cluster/vars/vault_vars.yaml) "vault_vars.yaml" in the prod_cluster/vars folder.
 [For DR Cluster](dr_cluster/vars/vault_vars.yaml) "vault_vars.yaml" in the dr_cluster/vars folder.
 
@@ -128,7 +129,3 @@ Some additional variables must be set in an Ansible Vault to keep the sensitive 
 | `LOGIN`                 | `string` | `admin:$apr1$aa.pY/bb/`| For K10 Basic Authentication.  Use 'htpasswd -n admin' and provide a password to autenticate to Kasten K10             |
 
 **NOTE**: It is recommended to use Ansible Vaults to keep this data instead of using just a text file, considering all the sensitive data to be kept here.
-
-# Recovery duration
-
-The entire recovery process will take approx 30 minutes plus the time required for applications and data to recover. 
