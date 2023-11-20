@@ -1,0 +1,5 @@
+plugin: kubernetes.core.k8s
+connections:
+  - host: https://35.234.150.13:8443
+    api_key: ya29.a0Ael9sCN7y2CZNpsisFeSk47PDMtoYqOtDZHfcHOhWEwby6mUoKWBvfYfINXNZu5jGKLDlBq8c3tCW-bT4EvLpB80G-g0rJv5asN8Nww8jVw6XMo6bXewMPC7UIjVPDBtv1qkkJd2Ilvb2IqSkALH4iEKXrTzPy2E2gaCgYKAQkSARASFQF4udJh9FPX14vXHwo68oy-Oh9rPg0169
+    validate_certs: false
